@@ -18,7 +18,7 @@ spec:
         app: fb
     spec:
       containers:
-      - image: nhiuana/fb:v5
+      - image: "${HARBOR_HOST}/${HARBOR_PROJECT}/fb:${CI_COMMIT_TAG}" #nhiuana/fb:v5
         name: fb
         resources: {}
 status: {}
