@@ -1,5 +1,8 @@
 stages:
+- Check
+- SCA
 - Build
+- Image
 - deploy
 - review
 - dast
@@ -16,6 +19,47 @@ stages:
 #  before_script:
 #    - docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD $HARBOR_HOST
 
+cpp:
+  stage: Check
+  tags:
+    - dck
+  image:
+    name: neszt/cppcheck-docker
+    entrypoint:
+      - '/usr/bin/env'
+      - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin'
+  script:
+    - cppcheck .
+
+cpp_report:
+  stage: Check
+  tags:
+    - docker
+  image: rockylinux:9.1
+  script:
+    - yum -y install python3-pip
+    - python3 -m pip install -U cppcheck_codequality
+    - cppcheck-codequality --input-file=cppcheck_out.xml --output-file=cppcheck.json
+    - if cat cppcheck_out.xml | grep -q "\"error\""; then echo "ERRORS have been detected"; exit 1; fi;
+  artifacts:
+    reports:
+      codequality: cppcheck.json
+  dependencies:
+    - cpp
+  needs:
+    - job: cpp
+
+kics:
+  stage: Check
+  tags:
+    - docker
+  image:
+    name: checkmarx/kics:latest
+    entrypoint:
+      - '/usr/bin/env'
+      - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/app/bin'
+  script:
+    - kics scan -p $(pwd)
 
 compile:
   stage: Build
@@ -49,18 +93,34 @@ image build:
     - job: compile
       artifacts: true
 
+Scan:
+  stage: Image
+  tags:
+    - docker
+  image: 
+    name: aquasec/trivy:latest
+    entrypoint:
+      - '/usr/bin/env'
+      - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin'
+  script:
+    - trivy image --exit-code 1 "${HARBOR_HOST}/${HARBOR_PROJECT}/fb:test"
+  dependencies:
+    - image build
+  needs:
+    - job: image build
+
 
 upload to registry:
-  stage: Package
+  stage: Image
   tags:
     - local
   script:
     - docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD $HARBOR_HOST
     - docker push "${HARBOR_HOST}/${HARBOR_PROJECT}"/fb:test #${CI_COMMIT_TAG}"
   dependencies:
-    - image build
+    - Scan
   needs:
-    - job: image build
+    - job: Scan
 
 deploy:
   stage: test
