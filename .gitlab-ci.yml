@@ -1,6 +1,5 @@
 stages:
 - Build
-- test
 - deploy
 - review
 - dast
@@ -10,6 +9,7 @@ stages:
 - production
 - performance
 - cleanup
+- test
 
 
 #default:
@@ -20,7 +20,7 @@ stages:
 compile:
   stage: Build
   tags:
-    - docker-02
+    - dck
   image:
     name: harbor.lab.com/library/make:v1.1
     entrypoint:
@@ -53,7 +53,7 @@ image build:
 upload to registry:
   stage: test
   tags:
-    - dck
+    - local
   script:
     - docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD $HARBOR_HOST
     - docker push "${HARBOR_HOST}/${HARBOR_PROJECT}"/fb:33 #${CI_COMMIT_TAG}"
