@@ -66,18 +66,16 @@ stages:
 deploy:
   tags:
     - local
-#  image:
-#    name: bitnami/kubectl:latest
-#    entrypoint: ['']
   script:
     - echo $KUBECONFIG
     - kubectl config get-contexts
     - kubectl config use-context kind-demo
-#    - kubectl config use-context manuh/facebooc:joker
     - cat $KUBECONFIG
     - kubectl config view
     - kubectl get namespaces
     - kubectl get no
+    - cd "${pwd}/k8s/"
+    - kubectl apply -f .
 
 
 #build-image:
