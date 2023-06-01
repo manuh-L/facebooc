@@ -42,7 +42,7 @@ image build:
   tags:
     - local
   script:
-    - docker image build -t "${HARBOR_HOST}/${HARBOR_PROJECT}/fb:${CI_COMMIT_TAG}" -f fb.Dockerfile .
+    - docker image build -t "${HARBOR_HOST}/${HARBOR_PROJECT}/fb:test" -f fb.Dockerfile .
   dependencies:
     - compile
   needs:
@@ -60,6 +60,7 @@ upload to registry:
 
 
 deploy:
+  stage: test
   tags:
     - local
   environment: test
