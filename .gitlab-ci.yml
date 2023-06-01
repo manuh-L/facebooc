@@ -56,7 +56,7 @@ upload to registry:
     - local
   script:
     - docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD $HARBOR_HOST
-    - docker push "${HARBOR_HOST}/${HARBOR_PROJECT}"/fb:33 #${CI_COMMIT_TAG}"
+    - docker push "${HARBOR_HOST}/${HARBOR_PROJECT}"/fb:test #${CI_COMMIT_TAG}"
 
 
 deploy:
@@ -71,3 +71,7 @@ deploy:
     - kubectl get no
     - cd "$(pwd)/k8s/"
     - kubectl apply -f fb.yml -n test
+  dependencies:
+    - upload to registry
+  needs:
+    - job: upload to registry
