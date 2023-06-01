@@ -18,7 +18,7 @@ stages:
 
 
 compile:
-  stage: build
+  stage: Build
   tags:
     - docker-02
   image:
