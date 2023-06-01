@@ -76,7 +76,7 @@ deploy:
     - kubectl get namespaces
     - kubectl get no
     - cd "$(pwd)/k8s/"
-    - kubectl apply -f fb.yml -n "${NS}"
+    - envsubst fb.yml | kubectl apply -f fb.yml -n "${NS}"
     - echo "${HARBOR_HOST}/${HARBOR_PROJECT}/fb:${CI_COMMIT_TAG}"
 
 
