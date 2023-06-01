@@ -51,13 +51,16 @@ image build:
 
 
 upload to registry:
-  stage: test
+  stage: Package
   tags:
     - local
   script:
     - docker login -u $HARBOR_USERNAME -p $HARBOR_PASSWORD $HARBOR_HOST
     - docker push "${HARBOR_HOST}/${HARBOR_PROJECT}"/fb:test #${CI_COMMIT_TAG}"
-
+  dependencies:
+    - image build
+  needs:
+    - job: image build
 
 deploy:
   stage: test
