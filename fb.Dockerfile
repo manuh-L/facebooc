@@ -1,4 +1,4 @@
-FROM nhiuana/ubuntu-libsqlite3:latest
+FROM harbor.lab.com/library/ubuntu-libsqlite3:v1
 WORKDIR /opt/facebooc
 COPY ./bin ./bin/
 COPY ./static ./static/
