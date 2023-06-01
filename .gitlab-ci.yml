@@ -2,11 +2,11 @@ stages:
 - Check
 - SCA
 - Build
+- Package
 - Image
 - deploy
 - review
 - dast
-- Package
 - staging
 - canary
 - production
