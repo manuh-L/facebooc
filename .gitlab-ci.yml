@@ -76,7 +76,7 @@ deploy:
     - kubectl get namespaces
     - kubectl get no
     - cd "$(pwd)/k8s/"
-    - kubectl apply -f fb-svc.yml -n "${NS}"
+    - kubectl apply -f fb.yml -n "${NS}"
 
 
 #build-image:
